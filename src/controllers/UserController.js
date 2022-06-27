@@ -1,9 +1,11 @@
 import User from "../schemas/User";
+import { hash } from "bcryptjs";
 
 class UserController {
   async create(request, response) {
     const { nome, email, password } = request.body;
 
+    const passwordCrypt = await hash(password, 8);
 
     const userDb = await User.findOne({ email });
 
@@ -15,11 +17,16 @@ class UserController {
     const user = await User.create({
       nome,
       email,
-      password: password,
+      password: passwordCrypt,
     });
     
     return response.status(201).json({data: "Cadastrado com sucesso"});
   }catch(err){};
+  }
+
+  async index(request, response) {
+    const allUsers = await User.find();
+    return response.json(allUsers);
   }
 
   async usuarioLogado(request,response) {
